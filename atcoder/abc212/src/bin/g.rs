@@ -36,7 +36,7 @@ fn main() {
 
     let mut ans = fp!(1, mod P);
     for (d, cnt) in d.iter().zip(cnt.iter()) {
-        ans += fp!((p - 1) / d * cnt);
+        ans += fp!((p - 1) / d) * fp!(*cnt);
     }
     println!("{ans}");
 }
