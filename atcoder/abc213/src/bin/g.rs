@@ -1,3 +1,5 @@
+use cplib::algebra::canonical::Canonical;
+use cplib::bitwise::set_power_series::elementary::sps_log;
 use itertools::Itertools;
 use proconio::input;
 use proconio::marker::Usize1;
@@ -12,36 +14,22 @@ fn main() {
         m: usize,
         ab: [(Usize1, Usize1); m],
     };
-    let mut dp = vec![fp!(0, mod P); 1 << n];
-    for i in 0..n {
-        dp[1 << i] = fp!(1);
-    }
+
+    let mut f = vec![fp!(1, mod P); 1 << n];
     for &(a, b) in &ab {
-        let mut ep = dp.clone();
         for v in 0..1 << n {
             if (v >> a) & 1 == 1 && (v >> b) & 1 == 1 {
-                ep[v] += dp[v];
-            }
-            let mut x = v;
-            loop {
-                let y = v - x;
-                if (x >> a) & 1 == 1 && (y >> a) & 1 == 0 && (x >> b) & 1 == 0 && (y >> b) & 1 == 1
-                {
-                    ep[v] += dp[x] * dp[y];
-                }
-                if x == 0 {
-                    break;
-                }
-                x = (x - 1) & v;
+                f[v] *= fp!(2);
             }
         }
-        dp = ep;
     }
+
+    let g = sps_log(&Canonical::new(), &f);
     let mut ans = vec![fp!(0); n];
     for v in 0..1 << n {
         for i in 1..n {
             if v & 1 == 1 && (v >> i) & 1 == 1 {
-                ans[i] += dp[v];
+                ans[i] += g[v];
             }
         }
     }
