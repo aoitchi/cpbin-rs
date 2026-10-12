@@ -9,6 +9,7 @@ dependencies = [
  "cplib",
  "itertools",
  "proconio",
+ "rand-gen",
 ]
 
 [[package]]
