@@ -28,34 +28,28 @@ fn main() {
         ps.push(p);
     }
 
-    let mut state = (vec![vec![fp!(0); t + 1]; n], vec![vec![fp!(0); t + 1]; n]);
-    for i in 0..n {
-        (state.0)[i][0] = fp!(1);
-    }
+    let mut f = vec![vec![fp!(0); t + 1]; n];
+    f[0][0] = fp!(1);
     cdq(
         t + 1,
-        &mut state,
-        |(f, acc), l, m, r| {
+        &mut f,
+        |f, l, m, r| {
             for i in 0..n {
                 for j in 0..n {
-                    if i != j && e[j][i] < m {
+                    if i != j && e[j][i] < ps.len() {
                         let h = poly_convolve(
                             &Canonical::new(),
                             f[j][l..m].to_vec(),
                             ps[e[j][i]][1..r - l].to_vec(),
                         );
                         for k in m..r {
-                            acc[i][k] += h[k - l - 1];
+                            f[i][k] += h[k - l - 1];
                         }
                     }
                 }
             }
         },
-        |(f, acc), k| {
-            for i in 0..n {
-                f[i][k] = acc[i][k];
-            }
-        },
+        |_, _| {},
     );
-    println!("{}", state.0[0][t]);
+    println!("{}", f[0][t]);
 }
