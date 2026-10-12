@@ -1,32 +1,32 @@
 use proconio::input;
 use proconio::marker::Bytes;
 
-const P: u64 = 1_000_000_007;
+use cplib::num::fp::fp;
+
+const P: u32 = 1_000_000_007;
 
 fn main() {
     input! {
         s: Bytes,
     };
     let n = s.len();
-    let mut dp = vec![0, 1];
-    let mut prev = vec![];
-    let mut tmp = [0; 26];
-    for (i, &c) in s.iter().enumerate() {
-        prev.push(tmp.clone());
-        tmp[(c - b'a') as usize] = i + 1;
-    }
-
+    let mut f = vec![fp!(1, mod P)];
+    let mut g = vec![fp!(0, mod P), fp!(1)];
+    let mut prev = [n; 26];
+    prev[(s[0] - b'a') as usize] = 0;
     for (i, c) in s.iter().enumerate().skip(1) {
-        dp.push(
-            (dp[dp.len() - 1] + dp[dp.len() - 2] + P
-                - if i == 0 {
-                    0
-                } else {
-                    dp[prev[i][(c - b'a') as usize]]
-                }
-                + 1)
-                % P,
-        );
+        let c = (c - b'a') as usize;
+        let a = if prev[c] == n || prev[c] == 0 {
+            0
+        } else {
+            prev[c] - 1
+        };
+        let b = i - 1;
+        let x =
+            if a < b { g[b] - g[a] } else { fp!(0) } + if prev[c] == n { fp!(1) } else { fp!(0) };
+        f.push(x);
+        g.push(g.last().unwrap() + x);
+        prev[c] = i;
     }
-    println!("{}", dp[n]);
+    println!("{}", g.last().unwrap());
 }
